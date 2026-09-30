@@ -1,0 +1,41 @@
+name: Import Module 0
+
+on:
+  push:
+    paths:
+      - 'module0-package.b64'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Decode and unpack Module 0
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode module0-package.b64 > /tmp/module0.zip
+          rm -rf /tmp/module0
+          mkdir -p /tmp/module0
+          unzip -q /tmp/module0.zip -d /tmp/module0
+          cp -a /tmp/module0/the-cricketer-module-0/. ./
+          rm -f module0-package.b64
+
+      - name: Commit imported source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: import complete Module 0 source package"
+          git push origin HEAD:main
