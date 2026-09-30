@@ -3,7 +3,7 @@ name: Import Module 0
 on:
   push:
     paths:
-      - 'module0-package.b64'
+      - 'module0-ready.txt'
 
 permissions:
   contents: write
@@ -19,12 +19,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode module0-package.b64 > /tmp/module0.zip
+          cat module0-package.b64.part-* > /tmp/module0.b64
+          base64 --decode /tmp/module0.b64 > /tmp/module0.zip
           rm -rf /tmp/module0
           mkdir -p /tmp/module0
           unzip -q /tmp/module0.zip -d /tmp/module0
           cp -a /tmp/module0/the-cricketer-module-0/. ./
-          rm -f module0-package.b64
+          rm -f module0-package.b64.part-* module0-ready.txt
 
       - name: Commit imported source tree
         shell: bash
